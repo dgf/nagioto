@@ -16,5 +16,13 @@ public class Service {
     public String status;
 
 
+    @Override
+    public String toString() {
+        return "Service{" +
+                "host='" + host + '\'' +
+                ", service='" + service + '\'' +
+                ", status='" + status + '\'' +
+                '}';
+    }
 }
 

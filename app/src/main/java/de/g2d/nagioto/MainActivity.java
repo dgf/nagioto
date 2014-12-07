@@ -66,6 +66,17 @@ public class MainActivity extends ActionBarActivity implements UiCallback {
         Log.d("MainActivity", "create main activity");
         setContentView(R.layout.activity_main);
 
+        findViewById(R.id.refreshButton).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (serviceBound) {
+                    if (serviceBound) {
+                        backgroundService.fetchStatus(settings, MainActivity.this);
+                    }
+                }
+            }
+        });
+
         serverList = new ServerList();
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
