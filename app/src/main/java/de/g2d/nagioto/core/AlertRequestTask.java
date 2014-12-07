@@ -1,23 +1,41 @@
 package de.g2d.nagioto.core;
 
 import android.content.Context;
-import android.os.AsyncTask;
+import android.util.Log;
 
-import de.g2d.nagioto.UiCallback;
+import java.io.IOException;
+
+import de.g2d.nagioto.domain.IcingaMapper;
 import de.g2d.nagioto.domain.ServiceResponse;
-import de.g2d.nagioto.domain.Settings;
 
-/**
- * Created by sasse_h on 07.12.14.
- */
-public class AlertRequestTask extends AsyncTask<Settings, Void, ServiceResponse> {
-    public final static String QUERY = "status.cgi?jsonoutput&alerttypes=3";
+public class AlertRequestTask extends AbstractRequestTask<ServiceResponse> {
+    public final static String QUERY = "status.cgi?jsonoutput&style=detail&servicestatustypes=28";
     private static final String TAG = AlertRequestTask.class.getSimpleName();
-    private UiCallback callback;
+    private AlertRequestCallback callback;
     private Context context;
 
     @Override
-    protected ServiceResponse doInBackground(Settings... params) {
-        return null;
+    protected String getQuery() {
+        return QUERY;
+    }
+
+    @Override
+    protected ServiceResponse map(String json) throws IOException {
+        return new IcingaMapper().mapService(json);
+    }
+
+    public interface AlertRequestCallback {
+        void onFinish(ServiceResponse services);
+    }
+
+    public AlertRequestTask(Context context, AlertRequestCallback callback) {
+        this.context = context;
+        this.callback = callback;
+    }
+
+    @Override
+    protected void onPostExecute(ServiceResponse cgiResponse) {
+        Log.d(TAG, "post execute");
+        callback.onFinish(cgiResponse);
     }
 }
