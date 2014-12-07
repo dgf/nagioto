@@ -1,4 +1,4 @@
-package de.g2d.nagioto;
+package de.g2d.nagioto.core;
 
 import android.content.Context;
 import android.os.AsyncTask;
@@ -15,31 +15,34 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import java.io.IOException;
 import java.io.InputStream;
 
+import de.g2d.nagioto.StatusCallback;
+import de.g2d.nagioto.Utils;
 import de.g2d.nagioto.domain.Cgi2Response;
 import de.g2d.nagioto.domain.IcingaMapper;
 import de.g2d.nagioto.domain.Settings;
 
-public class RequestTask extends AsyncTask<Settings, Void, Cgi2Response> {
-
-    private StatusCallback onResponse;
+public class ServerRequestTask extends AsyncTask<Settings, Void, Cgi2Response> {
+    public final static String QUERY = "status.cgi?jsonoutput&style=hostdetail";
+    private static final String TAG = ServerRequestTask.class.getSimpleName();
+    private StatusCallback callback;
     private Context context;
 
-    public RequestTask(Context context, StatusCallback onResponse) {
+    public ServerRequestTask(Context context, StatusCallback callback) {
         this.context = context;
-        Log.d("RequestTask", "create task");
-        this.onResponse = onResponse;
+        Log.d(TAG, "create task");
+        this.callback = callback;
     }
 
     @Override
     protected void onPostExecute(Cgi2Response cgiResponse) {
-        Log.d("RequestTask", "post execute");
-        onResponse.onFinish(cgiResponse);
+        Log.d(TAG, "post execute");
+        callback.onServerList(cgiResponse.status.servers);
     }
 
     @Override
     protected Cgi2Response doInBackground(Settings... params) {
         Settings settings = params[0];
-        Log.d("RequestTask", "run baby");
+        Log.d(TAG, "run baby");
         InputStream inputStream;
         String data;
         try {
@@ -71,13 +74,13 @@ public class RequestTask extends AsyncTask<Settings, Void, Cgi2Response> {
     public java.io.InputStream requestServer(Settings settings) throws IOException, AuthenticationException {
         UsernamePasswordCredentials creds = new UsernamePasswordCredentials(settings.getUsername(), settings.getPassword());
         DefaultHttpClient client = new DefaultHttpClient();
-        HttpGet get = new HttpGet(settings.getUrl() + MainActivity.QUERY);
+        HttpGet get = new HttpGet(settings.getUrl() + QUERY);
         get.addHeader(new BasicScheme().authenticate(creds, get));
         Log.d("RequestTask", "request status CGI");
         HttpResponse response = client.execute(get);
         HttpEntity entity = response.getEntity();
 
-        Log.d("RequestTask", "response entity " + entity);
+        Log.d(TAG, "response entity " + entity);
         return entity.getContent();
     }
 

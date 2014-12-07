@@ -1,28 +1,66 @@
 package de.g2d.nagioto;
 
 import android.app.AlertDialog;
+import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
+import android.os.IBinder;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 
+import java.util.List;
+
+import de.g2d.nagioto.core.BackgroundService;
 import de.g2d.nagioto.domain.Cgi2Response;
+import de.g2d.nagioto.domain.Server;
 import de.g2d.nagioto.domain.Settings;
 import de.g2d.nagioto.view.ServerList;
 
 
 public class MainActivity extends ActionBarActivity {
-    public final static String QUERY = "status.cgi?jsonoutput&style=hostdetail";
+    private static final String TAG = MainActivity.class.getSimpleName();
     private ServerList serverList;
+    private Settings settings;
+    private BackgroundService backgroundService;
+    private boolean serviceBound;
+    private ServiceConnection serviceConnection = new ServiceConnection() {
+
+        @Override
+        public void onServiceConnected(ComponentName className, IBinder service) {
+            BackgroundService.BackgroundServiceBinder binder = (BackgroundService.BackgroundServiceBinder) service;
+            backgroundService = binder.getService();
+            serviceBound = true;
+            executeAfterServiceConnect();
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            serviceBound = false;
+            Log.d(TAG, ">>> BackgroundService unbind from activity");
+        }
+    };
+    private StatusCallback serverListCallback;
+
+    private void executeAfterServiceConnect() {
+        Log.d(TAG, ">>> BackgroundService bind to activity");
+        backgroundService.fetchServers(settings, serverListCallback);
+    }
+
+    @Override
+    protected void onResume() {
+        if (serviceBound) {
+            backgroundService.fetchServers(settings, serverListCallback);
+        }
+        super.onResume();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,8 +74,34 @@ public class MainActivity extends ActionBarActivity {
                     .add(R.id.container, serverList)
                     .commit();
         }
-        Settings settings = loadSettings();
-        showSettings(settings);
+
+
+        settings = loadSettings();
+        serverListCallback = new StatusCallback() {
+            @Override
+            public void onFinish(Cgi2Response cgiResponse) {
+
+            }
+
+            @Override
+            public void onServerList(List<Server> servers) {
+                serverList.update(servers);
+            }
+        };
+
+        // start background service
+        Intent intent = new Intent(this, BackgroundService.class);
+        bindService(intent, serviceConnection, BIND_AUTO_CREATE);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        if (serviceBound) {
+            backgroundService.stopSelf();
+            unbindService(serviceConnection);
+        }
     }
 
     private void showSettings(final Settings settings) {
@@ -60,14 +124,9 @@ public class MainActivity extends ActionBarActivity {
                 settings.setUsername(etUsername.getText().toString());
                 settings.setUrl(etUrl.getText().toString());
                 saveSettings(settings);
-                RequestTask requestTask = new RequestTask(MainActivity.this, new StatusCallback() {
-                    @Override
-                    public void onFinish(Cgi2Response cgiResponse) {
-                        serverList.update(cgiResponse.status.servers);
-                        Log.d("MainActivity", "UI callback to fill list - yeah");
-                    }
-                });
-                requestTask.execute(settings);
+                if (serviceBound) {
+                    backgroundService.fetchServers(settings, serverListCallback);
+                }
                 alertDialog.dismiss();
             }
         });
@@ -96,6 +155,15 @@ public class MainActivity extends ActionBarActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
+        Log.d(TAG, Integer.toString(menu.size()));
+        MenuItem item = menu.getItem(0);
+        item.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                showSettings(settings);
+                return false;
+            }
+        });
         return true;
     }
 
@@ -113,21 +181,4 @@ public class MainActivity extends ActionBarActivity {
 
         return super.onOptionsItemSelected(item);
     }
-
-    /**
-     * A placeholder fragment containing a simple view.
-     */
-    public static class PlaceholderFragment extends Fragment {
-
-        public PlaceholderFragment() {
-        }
-
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                                 Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.serverlist, container, false);
-            return rootView;
-        }
-    }
-
 }
