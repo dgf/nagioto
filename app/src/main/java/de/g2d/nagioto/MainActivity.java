@@ -50,6 +50,7 @@ public class MainActivity extends ActionBarActivity implements UiCallback {
     private void executeAfterServiceConnect() {
         Log.d(TAG, ">>> BackgroundService bind to activity");
         backgroundService.fetchStatus(settings, this);
+        backgroundService.startPolling(settings);
     }
 
     @Override
