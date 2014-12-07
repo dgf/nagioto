@@ -6,9 +6,14 @@ import java.io.IOException;
 
 public class IcingaMapper {
 
-    public Cgi2Response map(String jsonData) throws IOException {
+    public HostResponse mapHost(String jsonData) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
-        return mapper.readValue(jsonData, Cgi2Response.class);
+        return mapper.readValue(jsonData, HostResponse.class);
+    }
+
+    public ServiceResponse mapService(String jsonData) throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        return mapper.readValue(jsonData, ServiceResponse.class);
     }
 
 }

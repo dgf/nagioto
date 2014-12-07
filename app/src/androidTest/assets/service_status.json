@@ -1,0 +1,38 @@
+{ "cgi_json_version": "1.7.1", "status": {
+  "service_status": [
+    {
+      "host": "server.g2d.de",
+      "service": "SOA itib.de",
+      "status": "OK",
+      "last_check": "2014-12-07 02:54:36",
+      "duration": "6d  6h 13m 16s",
+      "attempts": "1/4",
+      "is_flapping": false,
+      "in_scheduled_downtime": false,
+      "active_checks_enabled": true,
+      "passive_checks_enabled": true,
+      "notifications_enabled": true,
+      "has_been_acknowledged": false,
+      "host_display_name": "server.g2d.de",
+      "service_display_name": "SOA itib.de",
+      "status_information": "DNS OK: 0.006 seconds response time. itib.de returns 212.227.253.223"
+    },
+    {
+      "host": "server.itib.de",
+      "service": "SOA itib.de",
+      "status": "OK",
+      "last_check": "2014-12-07 02:57:06",
+      "duration": "1d  7h 25m 46s",
+      "attempts": "1/4",
+      "is_flapping": false,
+      "in_scheduled_downtime": false,
+      "active_checks_enabled": true,
+      "passive_checks_enabled": true,
+      "notifications_enabled": true,
+      "has_been_acknowledged": false,
+      "host_display_name": "server.itib.de",
+      "service_display_name": "SOA itib.de",
+      "status_information": "DNS OK: 0.006 seconds response time. itib.de returns 212.227.253.223"
+    }
+  ]
+}}

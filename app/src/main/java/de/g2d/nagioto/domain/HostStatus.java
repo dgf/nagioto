@@ -4,9 +4,9 @@ import org.codehaus.jackson.annotate.JsonProperty;
 
 import java.util.List;
 
-public class Status {
+public class HostStatus {
 
     @JsonProperty("host_status")
-    public List<Server> servers;
+    public List<Host> servers;
 
 }

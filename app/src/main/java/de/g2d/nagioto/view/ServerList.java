@@ -15,15 +15,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.g2d.nagioto.R;
-import de.g2d.nagioto.domain.Server;
+import de.g2d.nagioto.domain.Host;
 
 public class ServerList extends Fragment {
 
-    private List<Server> servers;
+    private List<Host> servers;
     private Adapter adapter;
     private LayoutInflater layoutInflater;
 
-    public void update(List<Server> servers) {
+    public void update(List<Host> servers) {
         this.servers = servers;
         adapter.notifyDataSetChanged();
     }
@@ -63,7 +63,7 @@ public class ServerList extends Fragment {
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
-            Server server = servers.get(position);
+            Host server = servers.get(position);
             if (convertView == null) {
                 convertView = layoutInflater.inflate(R.layout.serverentry, null);
             }

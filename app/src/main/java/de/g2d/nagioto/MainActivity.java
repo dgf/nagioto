@@ -19,14 +19,20 @@ import android.widget.EditText;
 import java.util.List;
 
 import de.g2d.nagioto.core.BackgroundService;
-import de.g2d.nagioto.domain.Cgi2Response;
-import de.g2d.nagioto.domain.Server;
+import de.g2d.nagioto.domain.HostResponse;
+import de.g2d.nagioto.domain.Host;
+
 import de.g2d.nagioto.domain.Settings;
 import de.g2d.nagioto.view.ServerList;
 
 
 public class MainActivity extends ActionBarActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
+
+    public final static String QUERY_HOST = "status.cgi?jsonoutput&style=hostdetail";
+    public final static String QUERY_SERVICE = "status.cgi?jsonoutput";
+    public final static String QUERY_ALERT = "status.cgi?jsonoutput&alerttypes=3";
+
     private ServerList serverList;
     private Settings settings;
     private BackgroundService backgroundService;
@@ -78,13 +84,9 @@ public class MainActivity extends ActionBarActivity {
 
         settings = loadSettings();
         serverListCallback = new StatusCallback() {
-            @Override
-            public void onFinish(Cgi2Response cgiResponse) {
-
-            }
 
             @Override
-            public void onServerList(List<Server> servers) {
+            public void onServerList(List<Host> servers) {
                 serverList.update(servers);
             }
         };

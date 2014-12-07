@@ -1,6 +1,7 @@
 package de.g2d.nagioto;
 
 import android.content.Context;
+import android.content.res.AssetManager;
 import android.util.Log;
 
 import java.io.BufferedReader;
@@ -16,9 +17,9 @@ public class Utils {
 
     private static final String TAG = Utils.TAG;
 
-    public static void writeToFile(Context ctx, String data) {
+    public static void writeToFile(Context ctx, String filename, String data) {
         try {
-            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(ctx.openFileOutput("config.txt", Context.MODE_PRIVATE));
+            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(ctx.openFileOutput(filename, Context.MODE_PRIVATE));
             outputStreamWriter.write(data);
             outputStreamWriter.close();
         } catch (IOException e) {
@@ -27,10 +28,11 @@ public class Utils {
     }
 
 
-    public static String readFromFile(Context ctx) {
+    public static String readFromFile(Context ctx, String filename) {
         String ret = "";
         try {
-            InputStream inputStream = ctx.openFileInput("config.txt");
+            AssetManager assets = ctx.getAssets();
+            InputStream inputStream = assets.open(filename);
             if (inputStream != null) {
                 InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
                 BufferedReader bufferedReader = new BufferedReader(inputStreamReader);

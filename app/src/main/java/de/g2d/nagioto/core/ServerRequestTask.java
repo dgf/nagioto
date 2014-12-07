@@ -17,11 +17,11 @@ import java.io.InputStream;
 
 import de.g2d.nagioto.StatusCallback;
 import de.g2d.nagioto.Utils;
-import de.g2d.nagioto.domain.Cgi2Response;
+import de.g2d.nagioto.domain.HostResponse;
 import de.g2d.nagioto.domain.IcingaMapper;
 import de.g2d.nagioto.domain.Settings;
 
-public class ServerRequestTask extends AsyncTask<Settings, Void, Cgi2Response> {
+public class ServerRequestTask extends AsyncTask<Settings, Void, HostResponse> {
     public final static String QUERY = "status.cgi?jsonoutput&style=hostdetail";
     private static final String TAG = ServerRequestTask.class.getSimpleName();
     private StatusCallback callback;
@@ -34,13 +34,13 @@ public class ServerRequestTask extends AsyncTask<Settings, Void, Cgi2Response> {
     }
 
     @Override
-    protected void onPostExecute(Cgi2Response cgiResponse) {
+    protected void onPostExecute(HostResponse cgiResponse) {
         Log.d(TAG, "post execute");
         callback.onServerList(cgiResponse.status.servers);
     }
 
     @Override
-    protected Cgi2Response doInBackground(Settings... params) {
+    protected HostResponse doInBackground(Settings... params) {
         Settings settings = params[0];
         Log.d(TAG, "run baby");
         InputStream inputStream;
@@ -48,7 +48,8 @@ public class ServerRequestTask extends AsyncTask<Settings, Void, Cgi2Response> {
         try {
             inputStream = requestServer(settings);
             data = Utils.slurp(inputStream, 1024);
-            Utils.writeToFile(context, data);
+            Log.d("RequestTask", "write JSON data " + data);
+            Utils.writeToFile(context, "host.json", data);
         } catch (AuthenticationException e) {
             e.printStackTrace();
             throw new RuntimeException(e);
@@ -57,10 +58,10 @@ public class ServerRequestTask extends AsyncTask<Settings, Void, Cgi2Response> {
             throw new RuntimeException(e);
         }
 
-        Cgi2Response cgiResponse;
+        HostResponse cgiResponse;
         try {
             IcingaMapper mapper = new IcingaMapper();
-            cgiResponse = mapper.map(data);
+            cgiResponse = mapper.mapHost(data);
         } catch (IOException e) {
             e.printStackTrace();
             throw new RuntimeException(e);
