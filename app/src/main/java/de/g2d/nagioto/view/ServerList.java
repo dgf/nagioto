@@ -68,7 +68,7 @@ public class ServerList extends Fragment {
                 convertView = layoutInflater.inflate(R.layout.serverentry, null);
             }
             TextView tv = (TextView) convertView.findViewById(R.id.hostname);
-            tv.setText(server.host);
+            tv.setText(server.name);
             return convertView;
         }
     }

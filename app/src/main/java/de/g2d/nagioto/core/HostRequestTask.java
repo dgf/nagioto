@@ -15,41 +15,40 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import java.io.IOException;
 import java.io.InputStream;
 
-import de.g2d.nagioto.StatusCallback;
 import de.g2d.nagioto.Utils;
 import de.g2d.nagioto.domain.HostResponse;
 import de.g2d.nagioto.domain.IcingaMapper;
 import de.g2d.nagioto.domain.Settings;
 
-public class ServerRequestTask extends AsyncTask<Settings, Void, HostResponse> {
+public class HostRequestTask extends AsyncTask<Settings, Void, HostResponse> {
     public final static String QUERY = "status.cgi?jsonoutput&style=hostdetail";
-    private static final String TAG = ServerRequestTask.class.getSimpleName();
-    private StatusCallback callback;
+    private static final String TAG = HostRequestTask.class.getSimpleName();
+    private HostRequestCallback callback;
     private Context context;
 
-    public ServerRequestTask(Context context, StatusCallback callback) {
+    public interface HostRequestCallback {
+        void onFinish(HostResponse hosts);
+    }
+
+    public HostRequestTask(Context context, HostRequestCallback callback) {
         this.context = context;
-        Log.d(TAG, "create task");
         this.callback = callback;
     }
 
     @Override
     protected void onPostExecute(HostResponse cgiResponse) {
         Log.d(TAG, "post execute");
-        callback.onServerList(cgiResponse.status.servers);
+        callback.onFinish(cgiResponse);
     }
 
     @Override
     protected HostResponse doInBackground(Settings... params) {
         Settings settings = params[0];
-        Log.d(TAG, "run baby");
         InputStream inputStream;
         String data;
         try {
             inputStream = requestServer(settings);
             data = Utils.slurp(inputStream, 1024);
-            Log.d("RequestTask", "write JSON data " + data);
-            Utils.writeToFile(context, "host.json", data);
         } catch (AuthenticationException e) {
             e.printStackTrace();
             throw new RuntimeException(e);

@@ -9,9 +9,15 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 
+import java.io.IOException;
+
 import de.g2d.nagioto.R;
-import de.g2d.nagioto.StatusCallback;
+import de.g2d.nagioto.UiCallback;
+import de.g2d.nagioto.domain.HostResponse;
+import de.g2d.nagioto.domain.IcingaMapper;
+import de.g2d.nagioto.domain.ServiceResponse;
 import de.g2d.nagioto.domain.Settings;
+import de.g2d.nagioto.domain.Status;
 
 /**
  * Created by sasse_h on 07.12.14.
@@ -51,9 +57,28 @@ public class BackgroundService extends Service {
     }
 
 
-    public void fetchServers(Settings settings, StatusCallback callback) {
-        ServerRequestTask serverRequestTask = new ServerRequestTask(getApplicationContext(), callback);
-        serverRequestTask.execute(settings);
+    public void fetchStatus(final Settings settings, final UiCallback callback) {
+        HostRequestTask hostRequestTask = new HostRequestTask(getApplicationContext(), new HostRequestTask.HostRequestCallback() {
+            @Override
+            public void onFinish(final HostResponse hosts) {
+                ServiceRequestTask serviceRequestTask = new ServiceRequestTask(getApplicationContext(), new ServiceRequestTask.ServiceRequestCallback(){
+                    @Override
+                    public void onFinish(ServiceResponse services) {
+                        try {
+                            Status status = new IcingaMapper().mapStatus(hosts, services);
+                            callback.onStatusResponse(status);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                            throw new RuntimeException(e);
+                        }
+
+                    }
+                });
+                serviceRequestTask.execute(settings);
+            }
+        });
+        hostRequestTask.execute(settings);
+
     }
 
 }

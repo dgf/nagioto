@@ -16,22 +16,15 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
-import java.util.List;
-
 import de.g2d.nagioto.core.BackgroundService;
-import de.g2d.nagioto.domain.HostResponse;
-import de.g2d.nagioto.domain.Host;
 
 import de.g2d.nagioto.domain.Settings;
+import de.g2d.nagioto.domain.Status;
 import de.g2d.nagioto.view.ServerList;
 
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends ActionBarActivity implements UiCallback {
     private static final String TAG = MainActivity.class.getSimpleName();
-
-    public final static String QUERY_HOST = "status.cgi?jsonoutput&style=hostdetail";
-    public final static String QUERY_SERVICE = "status.cgi?jsonoutput";
-    public final static String QUERY_ALERT = "status.cgi?jsonoutput&alerttypes=3";
 
     private ServerList serverList;
     private Settings settings;
@@ -53,17 +46,16 @@ public class MainActivity extends ActionBarActivity {
             Log.d(TAG, ">>> BackgroundService unbind from activity");
         }
     };
-    private StatusCallback serverListCallback;
 
     private void executeAfterServiceConnect() {
         Log.d(TAG, ">>> BackgroundService bind to activity");
-        backgroundService.fetchServers(settings, serverListCallback);
+        backgroundService.fetchStatus(settings, this);
     }
 
     @Override
     protected void onResume() {
         if (serviceBound) {
-            backgroundService.fetchServers(settings, serverListCallback);
+            backgroundService.fetchStatus(settings, this);
         }
         super.onResume();
     }
@@ -83,13 +75,6 @@ public class MainActivity extends ActionBarActivity {
 
 
         settings = loadSettings();
-        serverListCallback = new StatusCallback() {
-
-            @Override
-            public void onServerList(List<Host> servers) {
-                serverList.update(servers);
-            }
-        };
 
         // start background service
         Intent intent = new Intent(this, BackgroundService.class);
@@ -127,7 +112,7 @@ public class MainActivity extends ActionBarActivity {
                 settings.setUrl(etUrl.getText().toString());
                 saveSettings(settings);
                 if (serviceBound) {
-                    backgroundService.fetchServers(settings, serverListCallback);
+                    backgroundService.fetchStatus(settings, MainActivity.this);
                 }
                 alertDialog.dismiss();
             }
@@ -182,5 +167,10 @@ public class MainActivity extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onStatusResponse(Status status) {
+        serverList.update(status.hosts);
     }
 }
