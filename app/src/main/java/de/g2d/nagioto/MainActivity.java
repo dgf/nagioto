@@ -24,14 +24,16 @@ import de.g2d.nagioto.view.ServerList;
 
 
 public class MainActivity extends ActionBarActivity implements UiCallback {
+
     private static final String TAG = MainActivity.class.getSimpleName();
 
     private ServerList serverList;
     private Settings settings;
     private BackgroundService backgroundService;
-    private boolean serviceBound;
-    private ServiceConnection serviceConnection = new ServiceConnection() {
 
+    private boolean serviceBound;
+
+    private ServiceConnection serviceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName className, IBinder service) {
             BackgroundService.BackgroundServiceBinder binder = (BackgroundService.BackgroundServiceBinder) service;
@@ -71,9 +73,7 @@ public class MainActivity extends ActionBarActivity implements UiCallback {
             @Override
             public void onClick(View v) {
                 if (serviceBound) {
-                    if (serviceBound) {
-                        backgroundService.fetchStatus(settings, MainActivity.this);
-                    }
+                    backgroundService.fetchStatus(settings, MainActivity.this);
                 }
             }
         });
@@ -111,9 +111,11 @@ public class MainActivity extends ActionBarActivity implements UiCallback {
         final EditText etUrl = (EditText) settingsView.findViewById(R.id.url);
         final EditText etUsername = (EditText) settingsView.findViewById(R.id.username);
         final EditText etPassword = (EditText) settingsView.findViewById(R.id.password);
+        final EditText etSeconds = (EditText) settingsView.findViewById(R.id.seconds);
         etUrl.setText(settings.getUrl());
         etUsername.setText(settings.getUsername());
         etPassword.setText(settings.getPassword());
+        etSeconds.setText(settings.getSeconds().toString());
 
         Button button = (Button) settingsView.findViewById(R.id.connect);
         button.setOnClickListener(new View.OnClickListener() {
@@ -121,6 +123,7 @@ public class MainActivity extends ActionBarActivity implements UiCallback {
             public void onClick(View v) {
                 settings.setPassword(etPassword.getText().toString());
                 settings.setUsername(etUsername.getText().toString());
+                settings.setSeconds(Integer.parseInt(etSeconds.getText().toString()));
                 settings.setUrl(etUrl.getText().toString());
                 saveSettings(settings);
                 if (serviceBound) {
@@ -138,6 +141,7 @@ public class MainActivity extends ActionBarActivity implements UiCallback {
         editor.putString("url", settings.getUrl());
         editor.putString("username", settings.getUsername());
         editor.putString("password", settings.getPassword());
+        editor.putInt("seconds", settings.getSeconds());
         editor.commit();
     }
 
@@ -147,6 +151,7 @@ public class MainActivity extends ActionBarActivity implements UiCallback {
         settings.setUrl(sp.getString("url", "http://127.0.0.1/cgi-bin/icinga/"));
         settings.setUsername(sp.getString("username", "icke"));
         settings.setPassword(sp.getString("password", "secret"));
+        settings.setSeconds(sp.getInt("seconds", 37));
         return settings;
     }
 

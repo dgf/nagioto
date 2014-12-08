@@ -97,10 +97,10 @@ public class BackgroundService extends Service {
     }
 
     public void fetchStatus(final Settings settings, final UiCallback callback) {
-        HostRequestTask hostRequestTask = new HostRequestTask(getApplicationContext(), new HostRequestTask.HostRequestCallback() {
+        new HostRequestTask(getApplicationContext(), new HostRequestTask.HostRequestCallback() {
             @Override
             public void onFinish(final HostResponse hosts) {
-                ServiceRequestTask serviceRequestTask = new ServiceRequestTask(getApplicationContext(), new ServiceRequestTask.ServiceRequestCallback() {
+                new ServiceRequestTask(getApplicationContext(), new ServiceRequestTask.ServiceRequestCallback() {
                     @Override
                     public void onFinish(ServiceResponse services) {
                         try {
@@ -112,11 +112,9 @@ public class BackgroundService extends Service {
                         }
 
                     }
-                });
-                serviceRequestTask.execute(settings);
+                }).execute(settings);
             }
-        });
-        hostRequestTask.execute(settings);
+        }).execute(settings);
 
     }
 

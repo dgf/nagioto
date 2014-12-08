@@ -65,7 +65,7 @@ public class AlertRequestTask implements Runnable {
             msg.obj = cgiResponse;
             handler.sendMessage(msg);
             try {
-                Thread.sleep(1000 * 3);
+                Thread.sleep(1000 * settings.getSeconds());
             } catch (InterruptedException e) {
                 e.printStackTrace();
                 throw new RuntimeException(e);

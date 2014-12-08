@@ -15,6 +15,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:singleLine="true"
+            android:inputType="textUri"
             android:hint="URL" />
 
         <EditText
@@ -22,6 +23,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:singleLine="true"
+            android:inputType="text"
             android:hint="username" />
 
         <EditText
@@ -29,7 +31,16 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:singleLine="true"
+            android:inputType="textVisiblePassword"
             android:hint="password" />
+
+        <EditText
+            android:id="@+id/seconds"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:singleLine="true"
+            android:inputType="number"
+            android:hint="seconds" />
     </LinearLayout>
 
     <Button

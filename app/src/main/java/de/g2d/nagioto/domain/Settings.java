@@ -1,6 +1,15 @@
 package de.g2d.nagioto.domain;
 
 public class Settings {
+    public Integer getSeconds() {
+        return seconds;
+    }
+
+    public void setSeconds(Integer seconds) {
+        this.seconds = seconds;
+    }
+
+    private Integer seconds;
     private String password;
     private String username;
     private String url;
@@ -32,8 +41,8 @@ public class Settings {
     @Override
     public String toString() {
         return "Settings{" +
-                "password='" + password + '\'' +
-                ", username='" + username + '\'' +
+                "username='" + username + '\'' +
+                ", seconds='" + seconds + '\'' +
                 ", url='" + url + '\'' +
                 '}';
     }
