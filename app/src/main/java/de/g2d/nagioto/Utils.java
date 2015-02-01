@@ -80,8 +80,11 @@ public class Utils {
 
     public static boolean isActiveFragment(FragmentManager fragmentManager, String fragmentName) {
         int countOfFragments = fragmentManager.getBackStackEntryCount();
-        FragmentManager.BackStackEntry backStackEntryAt = fragmentManager.getBackStackEntryAt(countOfFragments - 1);
-        return backStackEntryAt != null && backStackEntryAt.getName().equals(fragmentName);
+        if (countOfFragments > 0) {
+            FragmentManager.BackStackEntry backStackEntryAt = fragmentManager.getBackStackEntryAt(countOfFragments - 1);
+            return backStackEntryAt != null && backStackEntryAt.getName().equals(fragmentName);
+        }
+        return false;
     }
 
 }

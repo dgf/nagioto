@@ -10,6 +10,7 @@
         android:orientation="vertical">
 
         <TextView
+            android:id="@+id/label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
@@ -20,8 +21,8 @@
             android:id="@+id/info"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="top"
             android:layout_margin="10dp"
+            android:gravity="top"
             android:text="Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet."
             android:textSize="18dp" />
 
@@ -37,17 +38,25 @@
             android:gravity="center"
             android:text="@string/error_stacktrace"
             android:textSize="16dp"
-            android:textStyle="italic" />
+            android:textStyle="italic"
+            android:visibility="gone" />
     </LinearLayout>
 
+    <Button
+        android:id="@+id/conn_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/contentContainer"
+        android:layout_margin="10dp"
+        android:text="Connectivity Settings"  android:visibility="gone"/>
 
     <ScrollView
         android:id="@+id/stacktrace_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="#99000000"
-        android:visibility="invisible"
-        android:fillViewport="true">
+        android:fillViewport="true"
+        android:visibility="invisible">
 
         <TextView
             android:id="@+id/stacktrace"

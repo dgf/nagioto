@@ -6,6 +6,8 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
@@ -97,8 +99,11 @@ public class BackgroundService extends Service {
         }
     }
 
-    public void startPolling(final Settings settings,final UiCallback callback) {
-        task = new AlertRequestTask(getApplicationContext(),callback,  notify, settings);
+    public void startPolling(final Settings settings, final UiCallback callback) {
+        if (!isNetworkUp(getApplicationContext())) {
+            onNoConnection(callback);
+        }
+        task = new AlertRequestTask(getApplicationContext(), callback, notify, settings);
         alertRunner = new Thread(task);
         alertRunner.start();
     }
@@ -121,6 +126,8 @@ public class BackgroundService extends Service {
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
+        } else if (!isNetworkUp(getApplicationContext())) {
+            onNoConnection(callback);
         } else {
             new HostRequestTask(getApplicationContext(), callback, new HostRequestCallback() {
                 @Override
@@ -140,6 +147,20 @@ public class BackgroundService extends Service {
             }).execute(settings);
         }
 
+    }
+
+    public static boolean isNetworkUp(Context context) {
+        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        return activeNetwork != null && activeNetwork.isConnectedOrConnecting();
+    }
+
+    private void onNoConnection(UiCallback errorCallback) {
+        if (!isNetworkUp(getApplicationContext())) {
+            String label = getResources().getString(R.string.error_network_label);
+            String message = getResources().getString(R.string.error_network);
+            errorCallback.onError(label, new Throwable(message));
+        }
     }
 
 }

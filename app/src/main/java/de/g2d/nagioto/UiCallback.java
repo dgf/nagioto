@@ -8,4 +8,5 @@ public interface UiCallback {
 
     void onError(Throwable throwable);
 
+    void onError(String label,Throwable throwable);
 }

@@ -27,7 +27,7 @@ import de.g2d.nagioto.view.ServerList;
 
 
 public class MainActivity extends ActionBarActivity implements UiCallback {
-
+    public static final int REQUEST_CODE = 10000;
     private static final String TAG = MainActivity.class.getSimpleName();
 
     private ServerList serverList;
@@ -74,8 +74,9 @@ public class MainActivity extends ActionBarActivity implements UiCallback {
             for (int i = countOfFragments - 1; i >= 0; i--) {
                 fragmentManager.popBackStackImmediate();
             }
+        } else {
+            super.onBackPressed();
         }
-//        super.onBackPressed();
     }
 
     @Override
@@ -109,6 +110,15 @@ public class MainActivity extends ActionBarActivity implements UiCallback {
     }
 
     @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+//        if (requestCode == REQUEST_CODE && resultCode == 0) {
+//            backgroundService.fetchStatus(settings, this);
+//        } else {
+//            // user did not act
+//        }
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
 
@@ -118,13 +128,14 @@ public class MainActivity extends ActionBarActivity implements UiCallback {
         }
     }
 
-    private void showError(Throwable throwable) {
+    private void showError(String label, Throwable throwable) {
         FragmentManager fragmentManager = getSupportFragmentManager();
         Info fragment = (Info) fragmentManager.findFragmentByTag(Info.TAG);
         if (fragment == null) {
             fragment = new Info();
-            fragment.setThrowable(throwable);
         }
+        fragment.setThrowable(throwable);
+        fragment.setLabel(label);
         FragmentTransaction transaction = fragmentManager.beginTransaction();
         transaction.replace(R.id.container, fragment, Info.TAG);
         transaction.addToBackStack(Info.TAG);
@@ -225,7 +236,13 @@ public class MainActivity extends ActionBarActivity implements UiCallback {
 
     @Override
     public void onError(Throwable throwable) {
-        showError(throwable);
+        String label = getResources().getString(R.string.error);
+        showError(label, throwable);
+    }
+
+    @Override
+    public void onError(String label, Throwable throwable) {
+        showError(label, throwable);
     }
 
     public void onToggleDemoClicked(View view) {
