@@ -8,6 +8,8 @@ import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -17,9 +19,9 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import de.g2d.nagioto.core.BackgroundService;
-
 import de.g2d.nagioto.domain.Settings;
 import de.g2d.nagioto.domain.Status;
+import de.g2d.nagioto.view.Info;
 import de.g2d.nagioto.view.ServerList;
 
 
@@ -52,7 +54,7 @@ public class MainActivity extends ActionBarActivity implements UiCallback {
     private void executeAfterServiceConnect() {
         Log.d(TAG, ">>> BackgroundService bind to activity");
         backgroundService.fetchStatus(settings, this);
-        backgroundService.startPolling(settings);
+        backgroundService.startPolling(settings, this);
     }
 
     @Override
@@ -61,6 +63,18 @@ public class MainActivity extends ActionBarActivity implements UiCallback {
             backgroundService.fetchStatus(settings, this);
         }
         super.onResume();
+    }
+
+    @Override
+    public void onBackPressed() {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        int countOfFragments = fragmentManager.getBackStackEntryCount();
+        if (Utils.isActiveFragment(fragmentManager, Info.TAG)) {
+            for (int i = countOfFragments - 1; i >= 0; i--) {
+                fragmentManager.popBackStackImmediate();
+            }
+        }
+//        super.onBackPressed();
     }
 
     @Override
@@ -101,6 +115,19 @@ public class MainActivity extends ActionBarActivity implements UiCallback {
             backgroundService.stopSelf();
             unbindService(serviceConnection);
         }
+    }
+
+    private void showError(Throwable throwable) {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        Info fragment = (Info) fragmentManager.findFragmentByTag(Info.TAG);
+        if (fragment == null) {
+            fragment = new Info();
+            fragment.setThrowable(throwable);
+        }
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+        transaction.replace(R.id.container, fragment, Info.TAG);
+        transaction.addToBackStack(Info.TAG);
+        transaction.commit();
     }
 
     private void showSettings(final Settings settings) {
@@ -189,5 +216,10 @@ public class MainActivity extends ActionBarActivity implements UiCallback {
     @Override
     public void onStatusResponse(Status status) {
         serverList.update(status.hosts);
+    }
+
+    @Override
+    public void onError(Throwable throwable) {
+        showError(throwable);
     }
 }

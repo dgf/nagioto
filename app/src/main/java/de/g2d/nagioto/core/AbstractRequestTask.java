@@ -13,33 +13,29 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import java.io.IOException;
 import java.io.InputStream;
 
+import de.g2d.nagioto.UiCallback;
 import de.g2d.nagioto.Utils;
 import de.g2d.nagioto.domain.Settings;
 
 public abstract class AbstractRequestTask<T> extends AsyncTask<Settings, Void, T> {
+    protected UiCallback errorCallback;
 
     @Override
     protected T doInBackground(Settings... params) {
         Settings settings = params[0];
         InputStream inputStream;
+        T cgiResponse = null;
         String data;
         try {
             inputStream = requestServer(settings);
             data = Utils.slurp(inputStream, 1024);
-        } catch (AuthenticationException e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
-        }
-
-        T cgiResponse;
-        try {
             cgiResponse = map(data);
+        } catch (AuthenticationException e) {
+            errorCallback.onError(e);
+            cancel(true);
         } catch (IOException e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
+            errorCallback.onError(e);
+            cancel(true);
         }
         return cgiResponse;
     }
@@ -56,5 +52,6 @@ public abstract class AbstractRequestTask<T> extends AsyncTask<Settings, Void, T
     }
 
     protected abstract String getQuery();
+
     protected abstract T map(String json) throws IOException;
 }

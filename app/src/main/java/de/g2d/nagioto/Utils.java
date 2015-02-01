@@ -2,6 +2,7 @@ package de.g2d.nagioto;
 
 import android.content.Context;
 import android.content.res.AssetManager;
+import android.support.v4.app.FragmentManager;
 import android.util.Log;
 
 import java.io.BufferedReader;
@@ -76,4 +77,11 @@ public class Utils {
         }
         return out.toString();
     }
+
+    public static boolean isActiveFragment(FragmentManager fragmentManager, String fragmentName) {
+        int countOfFragments = fragmentManager.getBackStackEntryCount();
+        FragmentManager.BackStackEntry backStackEntryAt = fragmentManager.getBackStackEntryAt(countOfFragments - 1);
+        return backStackEntryAt != null && backStackEntryAt.getName().equals(fragmentName);
+    }
+
 }

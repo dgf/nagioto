@@ -5,6 +5,8 @@ import android.util.Log;
 
 import java.io.IOException;
 
+import de.g2d.nagioto.UiCallback;
+import de.g2d.nagioto.api.ServiceRequestCallback;
 import de.g2d.nagioto.domain.IcingaMapper;
 import de.g2d.nagioto.domain.ServiceResponse;
 
@@ -27,12 +29,9 @@ public class ServiceRequestTask extends AbstractRequestTask<ServiceResponse> {
         return new IcingaMapper().mapService(json);
     }
 
-    public interface ServiceRequestCallback {
-        void onFinish(ServiceResponse services);
-    }
-
-    public ServiceRequestTask(Context context, ServiceRequestCallback callback) {
+    public ServiceRequestTask(Context context, UiCallback errorCallback, ServiceRequestCallback callback) {
         this.context = context;
+        this.errorCallback = errorCallback;
         this.callback = callback;
     }
 

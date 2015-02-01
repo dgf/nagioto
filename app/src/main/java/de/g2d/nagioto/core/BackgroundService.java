@@ -24,6 +24,8 @@ import java.util.List;
 import de.g2d.nagioto.MainActivity;
 import de.g2d.nagioto.R;
 import de.g2d.nagioto.UiCallback;
+import de.g2d.nagioto.api.HostRequestCallback;
+import de.g2d.nagioto.api.ServiceRequestCallback;
 import de.g2d.nagioto.domain.HostResponse;
 import de.g2d.nagioto.domain.IcingaMapper;
 import de.g2d.nagioto.domain.ServiceResponse;
@@ -64,6 +66,7 @@ public class BackgroundService extends Service {
 
         notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
+        // FIXME use interface as well
         notify = new Handler() {
             private int callCount = 0;
 
@@ -90,25 +93,24 @@ public class BackgroundService extends Service {
         }
     }
 
-    public void startPolling(final Settings settings) {
-        task = new AlertRequestTask(getApplicationContext(), notify, settings);
+    public void startPolling(final Settings settings,final UiCallback callback) {
+        task = new AlertRequestTask(getApplicationContext(),callback,  notify, settings);
         alertRunner = new Thread(task);
         alertRunner.start();
     }
 
     public void fetchStatus(final Settings settings, final UiCallback callback) {
-        new HostRequestTask(getApplicationContext(), new HostRequestTask.HostRequestCallback() {
+        new HostRequestTask(getApplicationContext(), callback, new HostRequestCallback() {
             @Override
             public void onFinish(final HostResponse hosts) {
-                new ServiceRequestTask(getApplicationContext(), new ServiceRequestTask.ServiceRequestCallback() {
+                new ServiceRequestTask(getApplicationContext(), callback, new ServiceRequestCallback() {
                     @Override
                     public void onFinish(ServiceResponse services) {
                         try {
                             Status status = new IcingaMapper().mapStatus(hosts, services);
                             callback.onStatusResponse(status);
                         } catch (IOException e) {
-                            e.printStackTrace();
-                            throw new RuntimeException(e);
+                            callback.onError(e);
                         }
 
                     }
