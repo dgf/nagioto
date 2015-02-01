@@ -10,8 +10,10 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -33,8 +35,8 @@ public class MainActivity extends ActionBarActivity implements UiCallback {
     private ServerList serverList;
     private Settings settings;
     private BackgroundService backgroundService;
-
     private boolean serviceBound;
+    private boolean refreshing;
 
     private ServiceConnection serviceConnection = new ServiceConnection() {
         @Override
@@ -54,6 +56,8 @@ public class MainActivity extends ActionBarActivity implements UiCallback {
 
     private void executeAfterServiceConnect() {
         Log.d(TAG, ">>> BackgroundService bind to activity");
+        refreshing = true;
+        invalidateOptionsMenu();
         backgroundService.fetchStatus(settings, this);
         backgroundService.startPolling(settings, this);
     }
@@ -61,6 +65,8 @@ public class MainActivity extends ActionBarActivity implements UiCallback {
     @Override
     protected void onResume() {
         if (serviceBound) {
+            refreshing = true;
+            invalidateOptionsMenu();
             backgroundService.fetchStatus(settings, this);
         }
         super.onResume();
@@ -89,6 +95,8 @@ public class MainActivity extends ActionBarActivity implements UiCallback {
             @Override
             public void onClick(View v) {
                 if (serviceBound) {
+                    refreshing = true;
+                    invalidateOptionsMenu();
                     backgroundService.fetchStatus(settings, MainActivity.this);
                 }
             }
@@ -107,15 +115,8 @@ public class MainActivity extends ActionBarActivity implements UiCallback {
         // start background service
         Intent intent = new Intent(this, BackgroundService.class);
         bindService(intent, serviceConnection, BIND_AUTO_CREATE);
-    }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-//        if (requestCode == REQUEST_CODE && resultCode == 0) {
-//            backgroundService.fetchStatus(settings, this);
-//        } else {
-//            // user did not act
-//        }
+        ActionBar actionBar = getSupportActionBar();
     }
 
     @Override
@@ -203,7 +204,7 @@ public class MainActivity extends ActionBarActivity implements UiCallback {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         Log.d(TAG, Integer.toString(menu.size()));
-        MenuItem item = menu.getItem(0);
+        MenuItem item = menu.getItem(1);
         item.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
@@ -211,6 +212,20 @@ public class MainActivity extends ActionBarActivity implements UiCallback {
                 return false;
             }
         });
+        return true;
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        MenuItem item = menu.findItem(R.id.action_progress);
+
+        if (refreshing) {
+            LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            View abprogress = inflater.inflate(R.layout.progress_wheel, null);
+            item.setActionView(abprogress);
+        } else {
+            item.setActionView(null);
+        }
         return true;
     }
 
@@ -231,17 +246,23 @@ public class MainActivity extends ActionBarActivity implements UiCallback {
 
     @Override
     public void onStatusResponse(Status status) {
+        refreshing = false;
+        invalidateOptionsMenu();
         serverList.update(status.hosts);
     }
 
     @Override
     public void onError(Throwable throwable) {
+        refreshing = false;
+        invalidateOptionsMenu();
         String label = getResources().getString(R.string.error);
         showError(label, throwable);
     }
 
     @Override
     public void onError(String label, Throwable throwable) {
+        refreshing = false;
+        invalidateOptionsMenu();
         showError(label, throwable);
     }
 
