@@ -1,8 +1,8 @@
 { "cgi_json_version": "1.7.1", "status": {
   "service_status": [
     {
-      "host": "server.g2d.de",
-      "service": "SOA itib.de",
+      "host": "host01",
+      "service": "www01",
       "status": "OK",
       "last_check": "2014-12-07 02:54:36",
       "duration": "6d  6h 13m 16s",
@@ -13,13 +13,30 @@
       "passive_checks_enabled": true,
       "notifications_enabled": true,
       "has_been_acknowledged": false,
-      "host_display_name": "server.g2d.de",
-      "service_display_name": "SOA itib.de",
-      "status_information": "DNS OK: 0.006 seconds response time. itib.de returns 212.227.253.223"
+      "host_display_name": "host 01",
+      "service_display_name": "HTTP www 01",
+      "status_information": "HTTP OK: HTTP/1.1 200 OK - 14718 bytes in 0.064 second response time"
     },
     {
-      "host": "server.itib.de",
-      "service": "SOA itib.de",
+      "host": "host01",
+      "service": "www02",
+      "status": "OK",
+      "last_check": "2014-12-07 02:54:36",
+      "duration": "6d  6h 13m 16s",
+      "attempts": "1/4",
+      "is_flapping": false,
+      "in_scheduled_downtime": false,
+      "active_checks_enabled": true,
+      "passive_checks_enabled": true,
+      "notifications_enabled": true,
+      "has_been_acknowledged": false,
+      "host_display_name": "host 01",
+      "service_display_name": "HTTP www 02",
+      "status_information": "HTTP OK: HTTP/1.1 200 OK - 14718 bytes in 0.064 second response time"
+    },
+    {
+      "host": "host02",
+      "service": "www03",
       "status": "OK",
       "last_check": "2014-12-07 02:57:06",
       "duration": "1d  7h 25m 46s",
@@ -30,9 +47,9 @@
       "passive_checks_enabled": true,
       "notifications_enabled": true,
       "has_been_acknowledged": false,
-      "host_display_name": "server.itib.de",
-      "service_display_name": "SOA itib.de",
-      "status_information": "DNS OK: 0.006 seconds response time. itib.de returns 212.227.253.223"
+      "host_display_name": "host 02",
+      "service_display_name": "HTTP www 03",
+      "status_information": "HTTP OK: HTTP/1.1 200 OK - 14718 bytes in 0.064 second response time"
     }
   ]
 }}

@@ -1,7 +1,7 @@
 { "cgi_json_version": "1.7.1", "status": {
   "host_status": [
     {
-      "host": "server.g2d.de",
+      "host": "host01",
       "status": "UP",
       "last_check": "2014-12-06 22:07:46",
       "duration": "0d 18h 10m 25s",
@@ -12,11 +12,11 @@
       "passive_checks_enabled": true,
       "notifications_enabled": true,
       "has_been_acknowledged": false,
-      "host_display_name": "server.g2d.de",
+      "host_display_name": "host 01",
       "status_information": "PING OK - Packet loss = 0%, RTA = 17.08 ms"
     },
     {
-      "host": "server.itib.de",
+      "host": "host02",
       "status": "UP",
       "last_check": "2014-12-06 22:11:46",
       "duration": "0d  1h 44m 55s",
@@ -27,7 +27,7 @@
       "passive_checks_enabled": true,
       "notifications_enabled": true,
       "has_been_acknowledged": false,
-      "host_display_name": "server.itib.de",
+      "host_display_name": "host 02",
       "status_information": "PING OK - Packet loss = 0%, RTA = 29.21 ms"
     }
   ]
