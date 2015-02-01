@@ -1,0 +1,40 @@
+{ "cgi_json_version": "1.7.1",
+  "status": {
+    "service_status": [
+      {
+        "host": "host01",
+        "service": "www01",
+        "status": "CRITICAL",
+        "last_check": "2015-02-01 02:14:10",
+        "duration": "55d 18h 25m 21s",
+        "attempts": "4/4",
+        "is_flapping": false,
+        "in_scheduled_downtime": false,
+        "active_checks_enabled": true,
+        "passive_checks_enabled": true,
+        "notifications_enabled": true,
+        "has_been_acknowledged": false,
+        "host_display_name": "host 01",
+        "service_display_name": "HTTP www 01",
+        "status_information": "CRITICAL"
+      },
+      {
+        "host": "host02",
+        "service": "www03",
+        "status": "WARNING",
+        "last_check": "2015-02-01 02:14:51",
+        "duration": "55d 19h 55m 46s",
+        "attempts": "4/4",
+        "is_flapping": false,
+        "in_scheduled_downtime": false,
+        "active_checks_enabled": true,
+        "passive_checks_enabled": true,
+        "notifications_enabled": true,
+        "has_been_acknowledged": false,
+        "host_display_name": "host 02",
+        "service_display_name": "HTTP www 03",
+        "status_information": "WARNING"
+      }
+    ]
+  }
+}

@@ -1,6 +1,7 @@
 package de.g2d.nagioto.core;
 
 import android.content.Context;
+import android.content.res.AssetManager;
 import android.os.Handler;
 import android.os.Message;
 
@@ -14,6 +15,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import de.g2d.nagioto.UiCallback;
 import de.g2d.nagioto.Utils;
@@ -30,6 +32,7 @@ public class AlertRequestTask implements Runnable {
     private Settings settings;
     private Context context;
     private boolean running = true;
+    private AtomicInteger demoCount = new AtomicInteger(0);
 
     public AlertRequestTask(Context context, UiCallback callback, Handler handler, Settings settings) {
         this.context = context;
@@ -67,15 +70,24 @@ public class AlertRequestTask implements Runnable {
         }
     }
 
-
     private java.io.InputStream requestServer(Settings settings) throws IOException, AuthenticationException {
-        UsernamePasswordCredentials creds = new UsernamePasswordCredentials(settings.getUsername(), settings.getPassword());
-        DefaultHttpClient client = new DefaultHttpClient();
-        HttpGet get = new HttpGet(settings.getUrl() + QUERY);
-        get.addHeader(new BasicScheme().authenticate(creds, get));
-        HttpResponse response = client.execute(get);
-        HttpEntity entity = response.getEntity();
-        return entity.getContent();
+        if (settings.isDemo()) { // rotate loaded demo files
+            int i = demoCount.addAndGet(1) % 3;
+            if (i == 0) {
+                i = 3;
+            }
+            String fileName = "alert_status_" + i + ".json";
+            AssetManager assets = context.getAssets();
+            return assets.open(fileName);
+        } else { // HTTP request
+            UsernamePasswordCredentials creds = new UsernamePasswordCredentials(settings.getUsername(), settings.getPassword());
+            DefaultHttpClient client = new DefaultHttpClient();
+            HttpGet get = new HttpGet(settings.getUrl() + QUERY);
+            get.addHeader(new BasicScheme().authenticate(creds, get));
+            HttpResponse response = client.execute(get);
+            HttpEntity entity = response.getEntity();
+            return entity.getContent();
+        }
     }
 
     public boolean isRunning() {

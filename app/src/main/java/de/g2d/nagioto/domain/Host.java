@@ -16,5 +16,13 @@ public class Host {
     public String status;
 
     public List<Service> services = new ArrayList<Service>();
+
+    @Override
+    public String toString() {
+        return "Host{" +
+                "name='" + name + '\'' +
+                ", status='" + status + '\'' +
+                '}';
+    }
 }
 

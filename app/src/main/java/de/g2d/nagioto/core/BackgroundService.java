@@ -20,12 +20,14 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import de.g2d.nagioto.MainActivity;
 import de.g2d.nagioto.R;
 import de.g2d.nagioto.UiCallback;
 import de.g2d.nagioto.api.HostRequestCallback;
 import de.g2d.nagioto.api.ServiceRequestCallback;
+import de.g2d.nagioto.Utils;
 import de.g2d.nagioto.domain.HostResponse;
 import de.g2d.nagioto.domain.IcingaMapper;
 import de.g2d.nagioto.domain.ServiceResponse;
@@ -36,12 +38,14 @@ import de.g2d.nagioto.domain.Status;
  * Created by sasse_h on 07.12.14.
  */
 public class BackgroundService extends Service {
+    private static final String TAG = MainActivity.class.getSimpleName();
     private IBinder binder = new BackgroundServiceBinder();
     private NotificationManager notificationManager;
     private NotificationCompat.Builder notification;
     private Handler notify;
     private Thread alertRunner;
     private AlertRequestTask task;
+    private AtomicInteger hostDemoCount = new AtomicInteger(0);
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -100,23 +104,41 @@ public class BackgroundService extends Service {
     }
 
     public void fetchStatus(final Settings settings, final UiCallback callback) {
-        new HostRequestTask(getApplicationContext(), callback, new HostRequestCallback() {
-            @Override
-            public void onFinish(final HostResponse hosts) {
-                new ServiceRequestTask(getApplicationContext(), callback, new ServiceRequestCallback() {
-                    @Override
-                    public void onFinish(ServiceResponse services) {
-                        try {
-                            Status status = new IcingaMapper().mapStatus(hosts, services);
-                            callback.onStatusResponse(status);
-                        } catch (IOException e) {
-                            callback.onError(e);
-                        }
-
-                    }
-                }).execute(settings);
+        if (settings.isDemo()) { // rotate loaded demo files
+            int i = hostDemoCount.addAndGet(1) % 2;
+            if (i == 0) {
+                i = 2;
             }
-        }).execute(settings);
+            String fileName = "host_status_" + i + ".json";
+            String hostData = Utils.readFromFile(this.getApplicationContext(), fileName);
+            String serviceData = Utils.readFromFile(this.getApplicationContext(), "service_status_1.json");
+            try {
+                IcingaMapper icingaMapper = new IcingaMapper();
+                HostResponse hostResponse = icingaMapper.mapHost(hostData);
+                ServiceResponse serviceResponse = icingaMapper.mapService(serviceData);
+                Status status = icingaMapper.mapStatus(hostResponse, serviceResponse);
+                callback.onStatusResponse(status);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            new HostRequestTask(getApplicationContext(), callback, new HostRequestCallback() {
+                @Override
+                public void onFinish(final HostResponse hosts) {
+                    new ServiceRequestTask(getApplicationContext(), callback, new ServiceRequestCallback() {
+                        @Override
+                        public void onFinish(ServiceResponse services) {
+                            try {
+                                Status status = new IcingaMapper().mapStatus(hosts, services);
+                                callback.onStatusResponse(status);
+                            } catch (IOException e) {
+                                callback.onError(e);
+                            }
+                        }
+                    }).execute(settings);
+                }
+            }).execute(settings);
+        }
 
     }
 

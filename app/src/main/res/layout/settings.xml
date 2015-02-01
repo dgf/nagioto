@@ -41,6 +41,14 @@
             android:singleLine="true"
             android:inputType="number"
             android:hint="seconds" />
+
+        <ToggleButton
+            android:id="@+id/demo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textOn="demo mode on"
+            android:textOff="demo mode off"
+            android:onClick="onToggleDemoClicked"/>
     </LinearLayout>
 
     <Button

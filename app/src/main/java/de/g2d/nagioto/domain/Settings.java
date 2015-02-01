@@ -13,6 +13,7 @@ public class Settings {
     private String password;
     private String username;
     private String url;
+    private boolean demo;
 
     public String getUrl() {
         return url;
@@ -38,6 +39,14 @@ public class Settings {
         this.password = password;
     }
 
+    public boolean isDemo() {
+        return demo;
+    }
+
+    public void setDemo(boolean demo) {
+        this.demo = demo;
+    }
+
     @Override
     public String toString() {
         return "Settings{" +
@@ -46,4 +55,5 @@ public class Settings {
                 ", url='" + url + '\'' +
                 '}';
     }
+
 }

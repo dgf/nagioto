@@ -17,6 +17,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ToggleButton;
 
 import de.g2d.nagioto.core.BackgroundService;
 import de.g2d.nagioto.domain.Settings;
@@ -100,7 +101,7 @@ public class MainActivity extends ActionBarActivity implements UiCallback {
         }
 
 
-        settings = loadSettings();
+        loadSettingPreferences();
 
         // start background service
         Intent intent = new Intent(this, BackgroundService.class);
@@ -130,7 +131,7 @@ public class MainActivity extends ActionBarActivity implements UiCallback {
         transaction.commit();
     }
 
-    private void showSettings(final Settings settings) {
+    private void showSettings() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         final AlertDialog alertDialog = builder.create();
         View settingsView = getLayoutInflater().inflate(R.layout.settings, null);
@@ -139,10 +140,12 @@ public class MainActivity extends ActionBarActivity implements UiCallback {
         final EditText etUsername = (EditText) settingsView.findViewById(R.id.username);
         final EditText etPassword = (EditText) settingsView.findViewById(R.id.password);
         final EditText etSeconds = (EditText) settingsView.findViewById(R.id.seconds);
+        final ToggleButton tbDemo = (ToggleButton) settingsView.findViewById(R.id.demo);
         etUrl.setText(settings.getUrl());
         etUsername.setText(settings.getUsername());
         etPassword.setText(settings.getPassword());
         etSeconds.setText(settings.getSeconds().toString());
+        tbDemo.setChecked(settings.isDemo());
 
         Button button = (Button) settingsView.findViewById(R.id.connect);
         button.setOnClickListener(new View.OnClickListener() {
@@ -152,7 +155,8 @@ public class MainActivity extends ActionBarActivity implements UiCallback {
                 settings.setUsername(etUsername.getText().toString());
                 settings.setSeconds(Integer.parseInt(etSeconds.getText().toString()));
                 settings.setUrl(etUrl.getText().toString());
-                saveSettings(settings);
+                settings.setDemo(tbDemo.isChecked());
+                saveSettingPreferences();
                 if (serviceBound) {
                     backgroundService.fetchStatus(settings, MainActivity.this);
                 }
@@ -162,24 +166,25 @@ public class MainActivity extends ActionBarActivity implements UiCallback {
         alertDialog.show();
     }
 
-    public void saveSettings(Settings settings) {
+    private void saveSettingPreferences() {
         SharedPreferences sp = getSharedPreferences("nagioto", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sp.edit();
         editor.putString("url", settings.getUrl());
         editor.putString("username", settings.getUsername());
         editor.putString("password", settings.getPassword());
         editor.putInt("seconds", settings.getSeconds());
+        editor.putBoolean("demo", settings.isDemo());
         editor.commit();
     }
 
-    public Settings loadSettings() {
-        Settings settings = new Settings();
+    private void loadSettingPreferences() {
+        settings = new Settings();
         SharedPreferences sp = getSharedPreferences("nagioto", Context.MODE_PRIVATE);
         settings.setUrl(sp.getString("url", "http://127.0.0.1/cgi-bin/icinga/"));
         settings.setUsername(sp.getString("username", "icke"));
         settings.setPassword(sp.getString("password", "secret"));
         settings.setSeconds(sp.getInt("seconds", 37));
-        return settings;
+        settings.setDemo(sp.getBoolean("demo", true));
     }
 
     @Override
@@ -191,7 +196,7 @@ public class MainActivity extends ActionBarActivity implements UiCallback {
         item.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
-                showSettings(settings);
+                showSettings();
                 return false;
             }
         });
@@ -221,5 +226,12 @@ public class MainActivity extends ActionBarActivity implements UiCallback {
     @Override
     public void onError(Throwable throwable) {
         showError(throwable);
+    }
+
+    public void onToggleDemoClicked(View view) {
+        ToggleButton tbDemo = (ToggleButton) view.findViewById(R.id.demo);
+        Log.d(TAG, "TOGGLE Demo Settings: " + tbDemo.isChecked());
+        settings.setDemo(tbDemo.isChecked());
+        saveSettingPreferences();
     }
 }
