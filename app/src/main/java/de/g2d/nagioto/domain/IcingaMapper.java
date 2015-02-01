@@ -1,13 +1,10 @@
 package de.g2d.nagioto.domain;
 
-import android.util.Log;
-
 import org.codehaus.jackson.map.ObjectMapper;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 public class IcingaMapper {
 
