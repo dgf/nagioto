@@ -15,6 +15,12 @@ public class Host {
     @JsonProperty
     public String status;
 
+    @JsonProperty("last_check")
+    public String lastCheck;
+
+    @JsonProperty
+    public String duration;
+
     public List<Service> services = new ArrayList<Service>();
 
     @Override
@@ -22,6 +28,8 @@ public class Host {
         return "Host{" +
                 "name='" + name + '\'' +
                 ", status='" + status + '\'' +
+                ", lastCheck='" + lastCheck + '\'' +
+                ", duration='" + duration + '\'' +
                 '}';
     }
 }

@@ -7,5 +7,8 @@
     <string name="error_network_label">Warning</string>
     <string name="error">Error</string>
     <string name="error_stacktrace">show stacktrace</string>
+    <string name="serverEntryStatus">Status</string>
+    <string name="serverEntry_last_check">Last Check</string>
+    <string name="serverEntry_duration">State Duration</string>
 
 </resources>

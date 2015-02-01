@@ -1,6 +1,7 @@
 package de.g2d.nagioto.view;
 
 import android.app.Activity;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -9,9 +10,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,6 +29,7 @@ public class ServerList extends Fragment {
     private List<Host> servers;
     private HostAdapter hostAdapter;
     private LayoutInflater layoutInflater;
+    private DateFormat dateFormat;
 
     public void update(List<Host> servers) {
         this.servers = servers;
@@ -35,6 +40,7 @@ public class ServerList extends Fragment {
     public void onAttach(Activity activity) {
         hostAdapter = new HostAdapter();
         servers = new ArrayList<>();
+        dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         super.onAttach(activity);
     }
 
@@ -71,17 +77,28 @@ public class ServerList extends Fragment {
                 convertView = layoutInflater.inflate(R.layout.serverentry, null);
                 ViewHolder viewHolder = new ViewHolder();
                 viewHolder.tvHostname = (TextView) convertView.findViewById(R.id.hostname);
-                viewHolder.serviceAdapter = new ServiceAdapter();
-                viewHolder.lvServices = (ListView) convertView.findViewById(R.id.servicesListView);
-                viewHolder.lvServices.setAdapter(viewHolder.serviceAdapter);
+                viewHolder.ivTrafficLight = (ImageView) convertView.findViewById(R.id.trafficLight);
+                viewHolder.tvState = (TextView) convertView.findViewById(R.id.status);
+                viewHolder.tvLastCheck = (TextView) convertView.findViewById(R.id.lastCheck);
+                viewHolder.tvDuration = (TextView) convertView.findViewById(R.id.duration);
+//                viewHolder.serviceAdapter = new ServiceAdapter();
+//                viewHolder.lvServices = (ListView) convertView.findViewById(R.id.servicesListView);
+//                viewHolder.lvServices.setAdapter(viewHolder.serviceAdapter);
                 convertView.setTag(viewHolder);
-
+            }
+            if (position % 2 == 0) {
+                convertView.setBackgroundColor(Color.parseColor("#fffae8"));
+            } else {
+                convertView.setBackgroundColor(Color.parseColor("#fedcbb"));
             }
             ViewHolder viewHolder = (ViewHolder) convertView.getTag();
             viewHolder.tvHostname.setText(host.name);
-            viewHolder.serviceAdapter.setServices(host.services);
-            viewHolder.lvServices.setAdapter(viewHolder.serviceAdapter);
-            viewHolder.serviceAdapter.notifyDataSetChanged();
+            viewHolder.tvState.setText(host.status);
+            viewHolder.tvLastCheck.setText(host.lastCheck);
+            viewHolder.tvDuration.setText(host.duration);
+//            viewHolder.serviceAdapter.setServices(host.services);
+//            viewHolder.lvServices.setAdapter(viewHolder.serviceAdapter);
+//            viewHolder.serviceAdapter.notifyDataSetChanged();
             return convertView;
         }
     }
@@ -126,7 +143,12 @@ public class ServerList extends Fragment {
 
     class ViewHolder {
         TextView tvHostname;
-        ListView lvServices;
-        ServiceAdapter serviceAdapter;
+        ImageView ivTrafficLight;
+        TextView tvState;
+        TextView tvLastCheck;
+        TextView tvDuration;
+
+//        ListView lvServices;
+//        ServiceAdapter serviceAdapter;
     }
 }
